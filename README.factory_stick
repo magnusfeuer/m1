@@ -1,0 +1,92 @@
+
+To build a assembly factory stick which will install with full DRM protection.
+
+All content is extracted from the database specified in factory_linuxrc
+
+
+1. Setup database
+Execute step 1,2 and 4 from README.db_setup
+
+
+
+2. Check out the code and change into the directory
+svn co svn+ssh://[username]@feuerworks.dyndns.org/home/svn/magden/dist/jway/trunk jway
+cd jway
+
+
+
+3. cd into jway directory.
+All the following instructions assumes that you are in this directory
+
+
+
+4. Load database logins
+. setup.sh
+
+
+
+5. Build kernel
+make kernel
+
+
+
+6. Create os packfile in database
+sudo sh create_os_db.sh 
+
+
+
+7. Create m1e binary packfile in database
+make m1e_db
+
+
+
+8. Create jway_core skin and check into database.
+make db DSKINS=jway/jway_core
+     
+9. Add serial number batch to database
+Either do 
+./jway/bin/gen_m1_serial -d magdenus_trusted -p [xxx] -h [host:port] -dmagdenus_trusted  -n [batch size]
+or import keys from the batch found in ../web/serial_batches.sql  (containing offial serial numbers)
+
+
+10. Add magden and demo keys to database.
+cd m1/core/trunk/keys
+../../../../bin/add_key -d magdenus_trusted -p [xxx] -h [host:port] -dmagdenus_trusted -k demo
+../../../../bin/add_key -d magdenus_trusted -p [xxx] -h [host:port] -dmagdenus_trusted -k magden
+
+
+
+
+11. Create stick.
+Insert stick into computer. And make note of the device it gets assigned (/dev/sda).
+
+sudo sh create_factory_install.sh /dev/sdb 192.168.0.20 192.168.0.151
+
+The "/dev/sdX" is replaced with the assigned USB stick device. It will be wiped so
+make sure it is the right device.
+
+[THIS WILL BE CHANGED USE 1 FOR NOW] "1" is the assmebly station using the stick. 
+The M1 unit will look into the database table trusted.assembly_station where the "id" 
+column matches the "1" number to figure out which lots were used to assemble this unit.
+
+The "192.168.0.20" is the local IP address that the M1 unit should use while being installed. Make
+sure that it is unique on the LAN.
+
+The "192.168.0.151" is the IP address of the database server hosting the "magdenus_trusted" database
+
+
+
+12. Setup m1 BIOS according to README.BIOS_settings.
+Set Advanced BIOS Features - First Boot Device to USB-ZIP
+
+
+
+13. Insert factory stick into M1 unit and boot it.
+
+
+
+
+14. Power cycle when install is done.
+Wait until install is complete. Remove stick and power cycle the M1
+
+

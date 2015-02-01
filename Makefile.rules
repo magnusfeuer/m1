@@ -1,0 +1,65 @@
+#
+# All rights reserved. Reproduction, modification, use or disclosure
+# to third parties without express authority is forbidden.
+# Copyright Magden LLC, California, USA, 2004, 2005, 2006, 2007.
+#
+
+#
+# Master target for an app
+#
+
+.PHONY: all
+all:   $(PLUGINS) $(APP) $(DDS_SOURCE) install_result
+
+
+$(FONTS):  
+	(for target in $(FONTS); do ( cd $(FONTS_SOURCE); $(MAKE) $(FONT) TARGETDIR=$(PWD)/dds SIZES=$(SIZES); done )
+
+$(APP): $(patsubst %,$(APP_ABS_ROOT)/%, $(APP))
+# Link in all files from the app to self's result_xxx directory
+	@echo
+	@echo "--- Building app $(@)"
+	@(cd $(abspath $(APP_ABS_ROOT))/$(@); $(MAKE))
+#	@(cd $(abspath $(APP_ABS_ROOT))/$(@); $(MAKE))
+
+install_result:
+	@echo
+	@echo "--- Linking results for $$PWD/[m1,dds,launch] to $(abspath $(TARGET_DIR))"
+# Link in all files from self's m1/dds/launch directoru to the corresponding result directory.
+	@-mkdir -p $(TARGET_DIR)/m1 $(TARGET_DIR)/dds $(TARGET_DIR)/launch > /dev/null 2>&1
+	@(cd m1;shopt -s nullglob; for i in *.m1; do  ln -snf $$PWD/$$i $(TARGET_DIR)/m1/$$i; done)
+	@(cd dds; shopt -s nullglob; for i in *.efnt *.dds *.jpg *.png *.gif; do ln -snf $$PWD/$$i $(TARGET_DIR)/dds/$$i; done)
+	@(cd launch;shopt -s nullglob; for i in *; do ln -snf $$PWD/$$i $(TARGET_DIR)/launch/$$i; done)
+
+
+
+#
+# Link compiled DDS files from source directory to self.
+#
+$(DDS_SOURCE): 
+	cd $(patsubst %,$(APP_ABS_ROOT)/src/%,$(DDS_SOURCE)); make
+	@echo
+	@echo "--- Linking compiled files from DDS source $(@) to local dds dir"
+# remove stale links
+	@-rm -f $(PWD)/dds/*.dds 
+	(cd $(abspath $(APP_ABS_ROOT)/src/$(@)/$(TARGET_FRAMEBUFFER)_dds); shopt -s nullglob; for i in *.efnt *.dds *.jpg *.png *.gif; do ln -sfn $$PWD/$$i $(PWD)/dds/$$i; done)
+
+$(PF_TARGET): 
+	(cd $(TARGET_DIR); $(BINDIR)/fs2pf -o$(PACKDIR)/$(PF_TARGET) $(PF_NEED) -P/m1/ -L -i$(PF_PACKID) $(PF_POSTACTION) . )
+
+
+pfile: $(PF_TARGET)
+
+dfile: 
+	(rev=`svn info | grep Revision | cut -d' ' -f 2`; cd $(TARGET_DIR); $(BINDIR)/fs2db -h$(DB_HOST) -u$(DB_USER) -p$(DB_PASSWORD) -d$(DB_DATABASE) -s$$rev $(PF_NEED) -r/m1/ -L -i$(PF_PACKID) $(PF_POSTACTION) . )
+
+$(PLUGINS): $(patsubst %,$(BUILD_ROOT)/lib/%.so, $(PLUGINS)) 
+	-mkdir -p $(TARGET_DIR)/plugin > /dev/null 2>&1
+	-rm -f $(TARGET_DIR)/plugin/$(patsubst $(BUILD_ROOT)/lib/%,%,$(@)).so
+	ln -s $(BUILD_ROOT)/lib/$(@).so $(TARGET_DIR)/plugin
+
+# Build rule for all plugins listed in PLUGINS
+$(patsubst %,$(BUILD_ROOT)/lib/%.so, $(PLUGINS)): $(patsubst %,$(PLUGIN_ABS_ROOT)/%,$(PLUGINS))
+	@echo
+	@echo "--- Linking $(abspath $(@)) to $(TARGET_DIR)/plugin"
+	(cd $(PLUGIN_ABS_ROOT)/$(patsubst $(BUILD_ROOT)/lib/%.so,%,$(@)); $(MAKE))

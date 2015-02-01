@@ -1,0 +1,242 @@
+This README goes through the step of creating a databasse, checking in the common/roll_demo content
+and finally checking out the same content to a local file system where it can be executed.
+
+
+--
+-- INTRODUCTION
+--
+
+The trusted MySQL database is used to create and maintain packfiles in the database. 
+The flow of things is like follow:
+
+
+                                                 +---> Packfiles (download) ---> USB stick ---> M1.
+                                                 |
+                                                 |
+Development environment --- (build) ---> MySQL --+
+                                                 |
+                                                 |
+                                                 +--- (factory install procedure) --->  M1.
+
+
+When a new package (or a new version of an existing package) has been tested, a packfile is created
+and is checked into the database through the build system. Once in the DB, the web server makes it 
+available in the shopping cart.
+
+The M1 assembly line boots special USB sticks which uses the DB to extract the initial content
+and unpack it to the Disk On Module.
+
+This instruction assumes that a build has been made in m1/jway/m1/core/trunk and that build binaries are
+available.
+
+
+
+--
+-- 1 - INITIAL SETUP.
+--
+
+Setup a local  MySQL 4.x or later with the following two databases:
+DB name #1: magdenus_trusted
+DB user #1: magdenus_trusted (full privs to magdenus_trusted)
+DB passwd #1: trusted
+
+DB name #2: magdenus_untrusted
+DB user #2: magdenus_untrusted (full privs to magdenus_untrusted)
+DB passwd #2: untrusted
+
+Check out m1/web.
+cd m1/web
+sh resetdb.sh
+
+You now have the two databases setup. Only trusted will be used to setup content and manage packfiles.
+
+
+
+
+--
+-- 2 - INSTALLING SERIAL NUMBERS
+--
+Every unit has a single serial number, stored in trusted.m1_serial. They must be setup for the
+content system to encrypt files and setup keys.
+To add a batch of 100 serial numbers do:
+
+gen_serial -n 100 
+
+These numbers will be assigned to units by add_m1 below.
+
+
+
+
+--
+-- 3 - SETTING UP AN M1 IN THE DATABASE
+--
+Normally this is done by the factory install stick, but we will do this step manually
+in order to get keys and serial numbers setup correctly.
+
+add_m1 -b 1 -D DEMO 
+
+A serial number from m1_serial is assigned and a device key is created and checked into the
+database.
+
+-b is the build order ID. Dummy value
+-D normally specifies the disk (/dev/hda) to read the IDE ID value from which is then
+used to encrypt the embedded device key in m1e. If the device is set to DEMO, the password
+DEMO will be used instead of the disk ID.
+
+See the created serial.txt to figure out the serial number that was assigned.
+
+The key (bin, pubo and key files from keytool) is installed in trusted.enc_key.
+To retrieve the key do:
+get_key -k [serial]
+
+
+
+
+--
+-- 4 - ADDING THE MAGDEN AND DEMO KEYS 
+--
+
+The command to add a key manually is
+add_key -k filename [-D]
+
+-D indicates that the key is a device key tied to a specific m1.
+
+filename.[key,bin,pub] will be opened and installed in trusted.enc_keys.
+
+To add the magden key and the demo key to the database, do:
+
+cd ~/m1/jway/m1/core/trunk/keys
+add_key -k magden
+add_key -k demo
+
+
+--
+-- 5 - ADDING CONTENT TO DATABASE
+-- 
+
+Run ~/m1/jway/setup.sh or set these variables.
+export DB_HOST=localhost
+export DB_USER=magdenus_trusted
+export DB_PASSWORD=trusted
+export DB_DATABASE=magdenus_trusted
+
+Build binaries:
+cd m1/jway/m1/core/trunk; make
+
+You now have several utilities to play with. The following concerns the database.
+
+db_ls_pf - List all packfiles available in database.
+db_rm_pf - Remove one or more versions of a packfile.
+fs2db - Create a packfile in the database from local file system content.
+db2pf - Create, and optionally encrypt, a packfile in the file system from the database.
+db2fs - Create, and optionally encrypt, local file system content from a database packfile.
+
+We will need to create three packfiles.
+m1@magden-auto.com/os/1.0.0 - The linux OS and boot loader files. Not really needed for local execution, but I have it anyway.
+m1@magden-auto.com/m1dbg_bin/1.0.0 - m1e.debug binary (doesn't read /dev/hda ID), spline2, hpcalc and a basic structure.
+m1@magden-auto.com/m1_core/1.0.0 - In this case common/roll_demo, but it is also the name of jway/jway_core and jway/roll_demo.
+
+
+First create the os packfile.
+sudo sh create_os_db.sh # Root is needed since we will create device files in local fs that are packed up.
+
+The add the m1e.debug binary.
+cd ~/m1/jway/m1/core/trunk; make debug_dpf
+
+Add the roll demo
+cd ~/m1/jway
+make db DSKINS=common/roll_demo # The last command will take a few minutes to copy all content to the database.
+
+
+
+
+
+---
+--- EXTRACTING M1 BINARY INTO LOCAL FILE SYSTEM
+---
+Create a directory to check out the file system to.
+mkdir tmp
+
+Create the directory where the installed packfile database is to live
+mkdir tmp/db
+
+Check out the m1 binary into tmp
+db2fs  -i m1@magden-auto.com/m1dbg_bin/1.0.0 -s [serial] -P -rtmp -Ddb
+
+-i Specifies the packfile to extract from the db.
+
+-P tells the db2fs to add a /m1/keys/magden.pub key signed by the device key.
+   It will also patch the m1e binary with the device public key before
+   it is saved to the local file system.
+
+-s Specifies the device key to use to patch m1e and sign the magden.pub key with.
+   Use the value from serial.txt above.
+
+-r specifies the directory to extract the packfile to. Defaults to -r ./
+
+-D specifies the directory (under the root specified by -r) where the database is to be installed.
+
+
+
+--
+-- TEST THAT ENCRYPTION WORKS
+--
+
+First check that the m1e itself works.
+
+To do this, we must grab the necessary private keys:
+mkdir priv_keys
+cd priv_keys
+get_key -k magden
+get_key -k [serial]
+rm *.pub
+
+
+With the keys in place, cd into tmp/m1 (as created by db2fs above).
+
+export M1_KEY_PATH=$PWD/keys
+
+cat > hello.m1  << __EOF__
+printf("Hello world\n");
+__EOF__
+
+./m1e hello.m1
+
+
+Now encrypt the hello.m1 with the device key and test again.
+signtool encrypt  -K ../../priv_keys/ -s [serial] -o hello_dev.m1 hello.m1
+./m1e hello_dev.m1
+
+Finally encrypt hello.m1 with the magden key and test again.
+signtool encrypt  -K ../../priv_keys/ -s magden -o hello_magden.m1 hello.m1
+./m1e hello_magden.m1
+
+
+
+
+--
+-- EXTRACT THE ROLL DEMO
+--
+cd to the directory above the tmp directory.
+
+db2fs -i m1@magden-auto.com/m1_core/1.0.0 -kmagden -S .m1 -rtmp -Ddb
+
+-S .m1 and -Kmagden tells db2fs to encrypt all files ending in .m1 with the
+magden private key before they are written to the file system.
+
+
+
+
+--
+-- RUN THE ROLL DEMO
+--
+cd tmp/m1
+sudo touch m1.db # Setup a new database...
+chmod 666 m1.db # ... that we can write to.
+export M1_BIN_PATH=$PWD
+export M1_KEY_PATH=$PWD/keys
+export M1_DATABASE=$PWD/m1.db
+export M1_FONT_PATH=$PWD/dds
+export M1_LIB_PATH=$PWD/plugin
+./m1e `cat launch/??-*`
+

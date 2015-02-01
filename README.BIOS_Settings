@@ -1,0 +1,177 @@
+
+Standard CMOS Features:
+  IDE Channel 0 Master: 
+    IDE Channel 0 Master: Auto
+
+  IDE Channel 0 Slave: 
+    IDE Channel 0 slave: None
+
+  IDE Channel 0 Master: 
+    IDE Channel 1 Master: None
+
+  IDE Channel 0 Slave: 
+    IDE Channel 1 slave: None
+
+  Drive A: None
+  Video: EGA/VGA
+  Halt On: No Errors
+
+Advanced BIOS Features:
+  Virus Warning: Disabled
+  CPU L1 & L2 Cache: Enabled
+  CPU L2 Cache ECC Checking: Disabled
+  QUick Power On Self Test: Enabled
+  CPU Feature:
+    Thermal Management: Thermal Monitor 1
+
+  Hard Disk Boot Priority:
+    1. Ch0 M. : PQI IDE DiskOnModule
+    2. Nootable Add-In Cards
+
+  CF Card Emulates to HDD: Disabled
+  First Boot Device: USB-ZIP NOTE: When install is complete, change to Hard Disk
+  Second Boot Device: Diabled
+  Third Boot Device: Diabled
+  Boot Other Device: Diabled
+  Boot Up Floppy Seek: Disabled
+  Boot Up NumLock Status: On
+  Typematic Rate Setting: Disabled
+  Security Option: Setup
+  MPS Version Control For OS: 1.4
+  OS Select for DRAM > 64MB: Non-OS2
+  HDD S.M.A.R.T Capability: Disabled
+  Report No FDD for Windows: Yes
+  Video BIOS Shadow: Enabled
+
+Advanced Chipset Features:
+  DRAM Timing Settings:
+    System Performance - By SPD
+    Write Recovery Time - 5T
+    DRAM Command Rate - 2T Command
+  
+  AGP Timing Settings
+    AGP Aperture Size - 128M
+    AGP Transfer Mode - 8X
+    AGP Driving Control - Auto
+    AGP Fast Write - Enabled
+    AGP Master 1 WS Write - Enabled
+    AGP Master 1 WS Read - Enabled
+    CPU to AGP Post Write - Enabled
+    AGP Delay Transaction - Enabled
+    AGP 3.0 Calibration Cycle - Disabled
+    VGA Share Memory Size - 64M
+    Direct Frame Buffer - Enabled
+    Select Display Device - CRT NOTE: When install complete set to TV with TV_Type NTSC and T_Connector Cr/Y/Cb
+    
+  PCI Timing Settings
+    PCI Master 1 WS Write - Disabled
+    PCI Master 1 WS Read - Disabled
+    CPU to PCI Post Write - Enabled
+    PCI Delay Transaction - Enabled
+    VLink Mode Selection - By Auto
+    VLink 8X Support - Enabled
+    DRDY_Timing - Slowest
+
+  Memory Hole - Disabled
+  System BIOS Cacheable - Enabled
+  Video RAM CAcheable - Enabled
+
+Integrated Peripherals
+  OnChip IDE Function
+    OnChip IDE Channel0 - Enabled
+    OnChip IDE Channel1 - Disabled
+    Primary Master PIO - Auto
+    Primary Slave PIO - Auto
+    Primary Master UDMA - Auto
+    Primary Slave UDMA - Auto
+    IDE DMA Transfer Access - Enabled
+    IDE Prefetch Mode - Disabled
+    IDE HDD Block Mode - Disabled
+
+  OnChip Device Funciton
+    VIA SATA Function - Disabled
+    VIA LAN Funciton - Enabled
+    VIA LAN BootRom - Disabled
+    VIA LAN BootRom Boot Option - Hook INT1
+    VIA LAN BootRom PXERPL Option - PXE
+    VIA MAC Address Input - [Don't touch this]
+    AC97 Sound Device - Auto
+    USB Host Controller - All Enabled
+    USB 2.0 Support - Enabled
+    USB Device Legacy Support - All On
+
+  Onboard Super IO Function
+    OnBoard FDD Controller - Disabled
+    Onboard Serial Port 1 - 3F8/IRQ4
+    Onboard Serial Port 2 - 2F8/IRQ3
+    UART Mode Select - Normal
+    Onboard Parallel Port - 378/IRQ7
+    Parallel Port Mode - SPP
+
+  Init Display First - Onboard
+
+Power Managment Setup
+  ACPI Function - Enabled
+  Video Off Option - Always off
+  Video off method - V/H SYNC+Blank
+  MODEM USE IEQ - 3
+  Power Button Function - Instant Off
+  Power after Power Failure - Always On
+  Wake Up Events
+    VGA - Off
+    LPT & COM - LPT/COM
+    HDD & FDD - ON
+    PCI Mater - OFF
+    Wake-Up on Ring - Disabled
+    Wake-Up on PCI PME/LAN - Disabled
+    PS2 KB Wakeup Selection - Hot Key
+    Wake-Up on Hot Key (PS2 KB) - Disabled
+    Wkae-Up on RTC Alarm - Disabled
+    IRQs Activities
+      Primary INTR - ON
+      IRQ3 (COM2) - Disabled
+      IRQ4 (COM1) - Enabled
+      IRQ5 (LPT2) - Enabled
+      IRQ6 (Floppy Disk) - Enabled
+      IRQ7 (LPT 1) - Enabled
+      IRQ8 (RTC Alarm) - Disabled
+      IRQ9 (IRQ2 Redir) - Disabled
+      IRQ10 (Reserved) - Disabled
+      IRQ11 (Reserved) - Disabled
+      IRQ12 (PS/2 Mouse) - Enabled
+      IRQ13 (Coporocessor) - Enabled
+      IRQ14 (Hard Disk) - Enabled
+      IRQ15 (Reserved) - Disabled
+
+PnP/PCI Configurations
+  IRQ Resources 
+    IRQ-5 assigned to - PCI Device
+    IRQ-7 assigned to - Reserved
+    IRQ-9 assigned to - PCI Device
+    IRQ-10 assigned to - PCI Device
+    IRQ-11 assigned to - PCI Device
+    IRQ-12 assigned to - PCI Device
+    IRQ-13 assigned to - PCI Device
+    IRQ-14 assigned to - PCI Device
+    IRQ-15 assigned to - PCI Device
+  
+  PCI/VGA Palette Snoop - Disabled
+  INT Pin 1 Assignment - Auto
+  INT Pin 2 Assignment - Auto
+  INT Pin 3 Assignment - Auto
+  INT Pin 4 Assignment - Auto
+
+PC Health Status
+  Shutdown Temperature - Disabled
+  CPU Thermal Throttling - Disabled
+  Show PCHealth in POST - Enabled
+
+Miscellaneous Control
+  Auto Detect PCI Clk - Enabled
+  Spread Spectrum - Disabled
+  CPU Clock Ratio - 10X
+  Host Clock at Next Boot - 100Mhz
+  DRAM Clock at Next Boot - 266Mhz(By SPD)
+  VDIMM Select - 1.80V (Default)
+  VAGP Select - 1.55V (Defailt)
+ Flash Part Write Protect - Disabled

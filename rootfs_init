@@ -1,0 +1,109 @@
+#!/bin/ash
+#
+# All rights reserved. Reproduction, modification, use or disclosure
+# to third parties without express authority is forbidden.
+# Copyright Magden LLC, California, USA, 2004, 2005, 2006, 2007.
+#
+# (C) 2006 Magden LLC. All rights reserved.
+
+# Cut down on dmesg clutter.
+dmesg -n 1
+
+# Mount proc
+mount -n /proc > /dev/null 2>&1
+
+# Create a /dev tmpfs for udev to operate on.
+mount -n -ttmpfs tmpfs /dev
+
+# Mount sysfs
+mount -n -tsysfs /sys /sys
+
+cd /
+
+# Setup a default device tree.
+cp -a /lib/udev/devices/* /dev
+
+#
+# Fire up the udev deamon
+#
+/sbin/udevd --daemon
+ 
+#
+# Busybox modprobe is broken, so we use the stock one
+#
+
+# Ethernet
+/sbin/big_modprobe via-rhine
+
+# VIA Graphics
+# Not needed since this is now compiled into the kernel
+#/sbin/big_modprobe via-agp
+#/sbin/big_modprobe via
+#/sbin/big_modprobe viafb
+
+
+# USB mass storage (mem stick)
+/sbin/big_modprobe usb-storage
+/sbin/big_modprobe uhci-hcd
+/sbin/big_modprobe ohci-hcd
+#/sbin/big_modprobe ehci-hcd # Problems with usb reset if stick present when booting.
+/sbin/big_modprobe sd-mod
+
+
+
+# USB mouse and track ball
+/sbin/big_modprobe usbhid
+
+# USB touch screen
+/sbin/big_modprobe usbtouchscreen
+/sbin/big_modprobe tkusb
+
+
+# Setup VIA hardware random generator
+/sbin/big_modprobe via-rng
+
+# Setup PL2303 serial interface for older apex units.
+/sbin/big_modprobe pl2303
+
+# Setup FTDI SIO serial interface for newer Apex units
+/sbin/big_modprobe ftdi_sio
+
+# Setup RTC clock
+/sbin/big_modprobe rtc
+
+# Let udev do its thing
+/sbin/udevadm settle
+
+# Setup ethernet addres
+#/sbin/ifconfig eth0 192.168.0.20
+#/usr/sbin/telnetd -l/bin/ash
+
+#/usr/sbin/hcid
+#sleep 3
+#/usr/bin/rfcomm connect hci0 00:80:98:C4:82:12 &
+#sleep 4
+stty -echo
+cd /m1
+export M1_BIN_PATH=/m1
+export M1_DATABASE=/dev/hda2
+export M1_LIB_PATH=/m1/plugin
+export M1_FONT_PATH=/m1/dds
+export M1_SHELL=/bin/ash
+export M1_KEY_PATH=/m1/keys
+while true
+do
+
+# Reset  DB if necessary
+if [ -f launch/master.db ]
+then
+    dd if=launch/master.db of=/dev/hda2 bs=128k > /dev/null 2>&1
+    rm -rf /mnt/*.csv
+fi
+
+/m1/m1e `cat launch/??-*` > /dev/log
+mount -oremount,ro /dev/hda1 / # Bug workaround since m1e internal remount fails for unknown reasons
+
+done
+
+
+

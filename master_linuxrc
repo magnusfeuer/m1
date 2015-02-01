@@ -1,0 +1,159 @@
+#!/bin/ash
+# (C) 2006,2007 Magden LLC. All rights reserved.
+# This script will be /sbin/init of the master USB memory stick created by create_master.sh
+# The purpose of the script is to do a factory (re-)install of an M1 unit.
+#
+
+# 
+# Decrease logging to avoid clutter
+#
+dmesg -n 1 
+
+
+insmod /lib/modules/2.6.24/kernel/drivers/scsi/scsi_mod.ko
+insmod /lib/modules/2.6.24/kernel/drivers/scsi/sd_mod.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/core/usbcore.ko
+insmod /lib/modules/2.6.24/kernel/drivers/hid/usbhid/usbhid.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/storage/usb-storage.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/host/uhci-hcd.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/host/ohci-hcd.ko
+# We get high speed USB device resets in the kernel log when we use ehci. Fall back to ohci for now.
+# insmod /lib/modules/2.6.24/kernel/drivers/usb/host/ehci-hcd.ko 
+
+
+#sleep 7
+mount -t proc none /proc
+
+cat <<EOF
+c
+
+
+                           Magden M1 Master Installer
+
+
+    WARNING: If you continue, you will erase *all* data and upgrades 
+             on your M1. When you are done your unit will be reset 
+             to its factory configuration and will only contain the 
+             default skins. 
+
+    This process will take a few minutes.
+
+    If you want to continue, please wait 30 seconds.
+    If you do not want to continue, remove the master USB memory 
+    stick and restart the M1.
+
+EOF
+
+# No expr and minimalistic shell gives crappy performance.
+echo -ne "    .............................. \r"; sleep 1
+echo -ne "    ............................. \r"; sleep 1
+echo -ne "    ............................ \r"; sleep 1
+echo -ne "    ........................... \r"; sleep 1
+echo -ne "    .......................... \r"; sleep 1
+echo -ne "    ......................... \r"; sleep 1
+echo -ne "    ........................ \r"; sleep 1
+echo -ne "    ....................... \r"; sleep 1
+echo -ne "    ...................... \r"; sleep 1
+echo -ne "    ..................... \r"; sleep 1
+echo -ne "    .................... \r"; sleep 1
+echo -ne "    ................... \r"; sleep 1
+echo -ne "    .................. \r"; sleep 1
+echo -ne "    ................. \r"; sleep 1
+echo -ne "    ................ \r"; sleep 1
+echo -ne "    ............... \r"; sleep 1
+echo -ne "    .............. \r"; sleep 1
+echo -ne "    ............. \r"; sleep 1
+echo -ne "    ............ \r"; sleep 1
+echo -ne "    ........... \r"; sleep 1
+echo -ne "    .......... \r"; sleep 1
+echo -ne "    ......... \r"; sleep 1
+echo -ne "    ........ \r"; sleep 1
+echo -ne "    ....... \r"; sleep 1
+echo -ne "    ...... \r"; sleep 1
+echo -ne "    ..... \r"; sleep 1
+echo -ne "    .... \r"; sleep 1
+echo -ne "    ... \r"; sleep 1
+echo -ne "    .. \r"; sleep 1
+echo -ne "    . \r"; sleep 1
+
+cd /
+cat <<EOF 
+c
+ 
+
+
+
+    Doing a master install.
+
+    Step | Description
+    -----+------------------------
+    1/3  | Formatting disk.
+EOF
+/sbin/big_fdisk /dev/hda << __EOF__  > /dev/null 2>&1
+d
+1
+d
+2
+d
+3
+d
+4
+n
+p
+1
+
++500M
+n
+p
+2
+
+
+w
+q
+__EOF__
+#
+# Zero out database
+#
+/bin/dd if=/dev/zero of=/dev/hda2 bs=1024 count=2000 > /dev/null 2>&1
+/sbin/mkfs.ext2 -m0  /dev/hda1  > /dev/null 2>&1
+/sbin/tune2fs -c0 -i0 /dev/hda1  > /dev/null 2>&1
+mount -text2 /dev/hda1 /mnt  > /dev/null 2>&1
+
+# Needed by pf2fs.
+mkdir -p /mnt/m1/install_db 
+mkdir -p /mnt/m1/keys 
+
+
+# Mount root read only
+mount -oro /dev/sda /fat > /dev/null 2>&1
+mount -oro /dev/sda1 /fat > /dev/null 2>&1
+
+echo "    2/3  | Installing m1 system."
+
+# Install from packfile
+pf2fs -r /mnt -d /mnt/m1/install_db -p /fat
+
+# copy serial nr
+cp /serial.txt /mnt/m1/serial.txt
+
+# Install from ram disk.
+
+echo "    3/3  | Finishing installation."
+grub --batch --device-map=/mnt/boot/grub/device.map --boot-drive=0x80 << EOF > /dev/null 2>&1
+root (hd0,0)
+setup (hd0)
+quit
+EOF
+
+mount -oremount,ro /dev/hda1 /mnt
+umount /dev/sda > /dev/null 2>&1
+umount /dev/sda1 > /dev/null 2>&1
+sync
+cat << EOF
+    ------------------------------
+
+    The M1 system has been installed.
+    Please power off the M1 now and remove the master USB memory stick.
+EOF
+sleep 100000
+reboot

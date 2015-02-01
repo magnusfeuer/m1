@@ -1,0 +1,278 @@
+
+1. A/D Converter Commands
+-------------------------
+
+Ann<tttt><CR>
+
+	When tttt > 0 the enable and start sample the analogue channel nn (hex)
+	[00-11]. The channel is sampled once every tttt milliseconds.
+	If tttt = 0 then disable the channel
+
+	tttt is the sample time	in milliseconds as a hex number.
+	Max number is EA60 = 60000, meaning that it's
+	not possible to have sample time longer than 1 minute.
+	If tttt is not given a sample time of 1000 milliseconds (03E8) is
+	 assumed.
+
+ann<CR>
+	Asynchrounous mode. Report AD samples every sample time
+	as setup by Ann
+
+	The sample will be reported as:
+
+	    AnnvvvvTTTT<CR>
+
+	 Where the nn is the input channel in hex, vvvv is hex 16 bit 
+	 sample number. In the case of 10 bit samples the value is scaled
+	 to the top 16 bits.
+	 To convert back to 10 bits then vvvv >> 6 is needed but to scale
+	 to float [0.0 - 1.0] then (vvvv/16#ffff) will be fine.
+	 TTTT is the number of milliseconds since last read.
+
+	 Command respons is either <CR> for ok or <BELL> for error.
+	 The channel must have been setup before this command (An)
+	 
+
+bnn<CR>
+	Change mode. Report AD samples when either sample value was
+	changed since last sample or if last report time is greater
+	than one minute. After isssue the command a sample will be
+	reported directly in order to initialize the sequence.
+
+	Samples will be reported the same way as the an command.
+
+	 Command respons is either <CR> for ok or <BELL> for error.
+	 The channel must have been setup before this command (An)
+
+rnn<CR>
+	Syncrounous read analouge value from channel nn.
+
+	Command respons is either RnnvvvvTTTT<CR> when ok
+	or  <BELL> for error.
+	The channel must have been setup before this command (An)
+
+2. Digital counter commands.
+----------------------------
+
+Dnn<tttt><CR>
+
+	Enable or disable digital counter sampling.
+	If tttt > 0 then set up digital input counter nn [00-02].
+	tttt is the sample time	in milliseconds as a hex number.
+	Max number is EA60 = 60000, meaning that it's
+	not possible to have sample time longer than 1 minute.
+
+	if tttt = 0 then disable the counter sampling.
+
+dnn<CR>
+	Start report the digital counter values asynchronously.
+	The sample will be reported as:
+
+	    DnnccccTTTT<CR>
+
+	 Where the n is the digital channel, cccc is hex 16 bit counter number.
+	 Since last read. A read will reset the counter.
+	 TTTT is the the number of milliseconds since the last read.
+
+enn<CR>
+
+	Read the digital input bit counter nn.
+	Reply as:
+
+	    Enncccctttt<CR>
+
+3. CAN commands (see CANUSB manual)
+-----------------------------------
+
+sxxyy
+	Not implemented
+
+S<0-8><CR>
+
+	Setup with standard CAN bit-rates where n is 0-8. 
+	This command is only active if the CAN channel is closed.
+
+	S0 Setup 10Kbit
+	S1 Setup 20Kbit
+	S2 Setup 50Kbit
+	S3 Setup 100Kbit
+	S4 Setup 125Kbit
+	S5 Setup 250Kbit
+	S6 Setup 500Kbit 
+	S7 Setup 800Kbit 
+	S8 Setup 1Mbit 
+
+	Example: S4[CR] 
+	Setup CAN to 125Kbit. 
+	Returns: CR (Ascii 13) for OK or BELL (Ascii 7) for ERROR.
+
+O<CR>
+	Open the CAN channel. 
+	This command is only active if the CAN channel is closed and 
+	has been set up prior with either the S or s command (i.e. initiated). 
+	Example: O<CR>
+	Open the channel 
+	Returns: CR (Ascii 13) for OK or BELL (Ascii 7) for ERROR.
+
+C<CR>
+
+	Close the CAN channel. 
+	This command is only active if the CAN channel is open. 
+	Example: C[CR] 
+	Close the channel 
+	Returns: CR (Ascii 13) for OK or BELL (Ascii 7) for ERROR.
+
+tiiildd...<CR>
+	
+	Transmit a standard (11bit) CAN frame. 
+	This command is only active if the CAN channel is open. 
+	iii Identifier in hex (000-7FF) 
+	l Data length (0-8) 
+	dd Byte value in hex (00-FF). Numbers of dd pairs 
+	must match the data length, otherwise an error 
+	occur. 
+	Example 1: t10021133[CR] 
+	Sends an 11bit CAN frame with ID=0x100, 2 bytes 
+	with the value 0x11 and 0x33. 
+	Example 2: t0200[CR] 
+	Sends an 11bit CAN frame with ID=0x20 & 0 bytes. 
+	Returns: z[CR] for OK or BELL (Ascii 7) for ERROR.
+
+Tiiiiiiiildd...<CR>
+	Transmit an extended (29bit) CAN frame. 
+	This command is only active if the CAN channel is open. 
+	iiiiiiii Identifier in hex (00000000-1FFFFFFF) 
+	l Data length (0-8) 
+	dd Byte value in hex (00-FF). Numbers of dd pairs 
+	must match the data length, otherwise an error 
+	occur. 
+	Example 1: t0000010021133[CR] 
+	Sends a 29bit CAN frame with ID=0x100, 2 bytes 
+	with the value 0x11 and 0x33. 
+	Returns: Z[CR] for OK or BELL (Ascii 7) for ERROR.
+
+F<CR>
+
+	Read Status Flags. 
+	This command is only active if the CAN channel is open. 
+	Example 1: F<CR>
+	Read Status Flags. 
+	Returns: An F with 2 bytes BCD hex value plus CR (Ascii 13) 
+	for OK. If CAN channel isn’t open it returns BELL 
+	(Ascii 7). This command also clear the RED Error 
+	LED. See availible errors below. E.g. F01[CR] 
+	Bit 0 CAN receive FIFO queue full 
+	Bit 1 CAN transmit FIFO queue full 
+	Bit 2 Error warning (EI), see SJA1000 datasheet 
+	Bit 3 Data Overrun (DOI), see SJA1000 datasheet 
+	Bit 4 Not used. 
+	Bit 5 Error Passive (EPI), see SJA1000 datasheet 
+	Bit 6 Arbitration Lost (ALI), see SJA1000 datasheet * 
+	Bit 7 Bus Error (BEI), see SJA1000 datasheet ** 
+
+	(no leds on ADC card is used!)
+	* Arbitration lost doesn’t generate a blinking RED light! 
+	** Bus Error generates a constant RED light!
+
+
+M<xxxx><CR>
+
+	Not implemented
+
+m<xxxx><CR>
+
+	Not implemented
+V<CR>
+	
+	Get Version number of both CANUSB hardware and software 
+	This command is active always. 
+	Example: V<CR>
+	Get Version numbers 
+	Returns: V and a 2 bytes BCD value for hardware version and 
+	a 2 byte BCD value for software version plus 
+	CR (Ascii 13) for OK. E.g. V1013[CR] 
+N
+	Get Serial number of the ADC card
+	This command is active always. 
+	Example: N<CR>
+	Get Serial number
+	Returns: N and a 4 bytes value for serial number plus 
+	CR (Ascii 13) for OK. E.g. NA123[CR] 
+	Note that the serial number can have both numerical 
+	and alfa numerical values in it. The serial number is 
+	also printed on the CANUSB for a quick reference, 
+	but could e.g. be used in a program to identify a 
+	CANUSB so the program know that it is set up in the 
+	correct way (for parameters saved in EEPROM).
+
+Zn<CR>
+	Sets Time Stamp ON/OFF for received frames only. 
+	This command is only active if the CAN channel is closed. 
+	The value will be saved in EEPROM and remembered next time 
+	the CANUSB is powered up. This command shouldn’t be used more 
+	than when you want to change this behaviour. It is set to OFF by 
+	default, to be compatible with old programs written for CANUSB. 
+	Setting it to ON, will add 4 bytes sent out from CANUSB with the A 
+	and P command or when the Auto Poll/Send feature is enabled. 
+	When using Time Stamp each message gets a time in milliseconds 
+	when it was received into the CANUSB, this can be used for real 
+	time applications for e.g. knowing time inbetween messages etc. 
+	Note however by using this feature you maybe will decrease 
+	bandwith on the CANUSB, since it adds 4 bytes to each message 
+	being sent (specially on VCP drivers). 
+	If the Time Stamp is OFF, the incomming frames looks like this: 
+	t10021133[CR] (a standard frame with ID=0x100 & 2 bytes) 
+	If the Time Stamp is ON, the incomming frames looks like this: 
+	t100211334D67[CR] (a standard frame with ID=0x100 & 2 bytes) 
+	Note the last 4 bytes 0x4D67, which is a Time Stamp for this 
+	specific message in milliseconds (and of course in hex). The timer 
+	in the CANUSB starts at zero 0x0000 and goes up to 0xEA5F before 
+	it loop arround and get’s back to 0x0000. This corresponds to exact 
+	60,000mS (i.e. 1 minute which will be more than enough in most 
+	systems). 
+	Example 1: Z0<CR>
+	Turn OFF the Time Stamp feature (default). 
+	Example 2: Z1<CR>
+	Turn ON the Time Stamp feature. 
+	Returns: CR (Ascii 13) for OK or BELL (Ascii 7) for ERROR.
+
+
+4. Misc commands
+----------------
+
+B<baud><CR>
+	Change buad rate on the ADC uart. The current default is 38400
+	but may be changed with this command.
+	The baud is given as a decimal number. 
+	
+	Example:
+		B115200
+
+s<n><CR>
+	s0 
+	   Report channels 1-8 in millivolts in step of 2mV
+	si 
+	   When i is 1-8 report channel i as binary 2 byte value
+	s9
+	   Report all channels 1-8 as binary 2 byte values (16 bytes)
+	   followed by a checksum byte, sum (+) over all bytes.
+
+	Note that no CR or BELL is returned by these commands. And that
+	no start tags are emitted. This command is implmented to interface
+	some programs out there (DMM ProfileLab)
+
+i<CR>
+	Debug information. Main loop frequency etc.
+
+Q<CR>
+
+	Enter OS prompt (only Forth version)
+
+	leave the prompt mode with
+	command: app-run
+
+ 
+
+Setup channel
+AXXYY  XX - channel in hex. YY - refresh rate in hex msec. Setup
+aXX XX channel stream

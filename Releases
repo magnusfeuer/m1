@@ -1,0 +1,80 @@
+Revision: 3177
+Date: 2008-08-14
+
+Changes:
++ Added support for up to 4 AFR inputs over standard OBD-II.
++ Fixed cursor ghosting on video modes with greater resolution than layout.
++ Now restarts application after resolution reset. 
++ Now restarts application after screen resolution change.
++ Now resets screen resolution after 10 sec press and hold (was 20).
++ Removed initial startup waiver dialog after application restart due to screen 
+  resolution change or screen resolution reset.
++ Layout with lesser resolution than actual screen is now centered correctly.
++ Added video output modes for composite video with a zoom factor and
+  support fvor 720*480 mode output signal.
++ Added support for Infiniti G37. 2008-current.
++ Added support for Dodge Viper 2008-current.
++ Added support for Scion tC 2008-current.
++ Added support for Scion xB 2008-current.
++ Added support for Scion xD 2008-current.
++ Added support for Acura tsx 2008-current.
++ Added support for Honda Accord V6 2008-current.
++ Added support for Honda Civic 2006-current.
++ Switched to correct image of Honda Civic Si.
++ Added specific gear count for each vehicle. (Was previously calculated
+  based on gear calibration dialog.)
++ Improved runtime install of packfiles.
+
+Revision: 3094
+Date: 2008-07-14
+1.0.0
+
+Revision: 2712
+Date: 2008-03-26
+Comments: m1_2008_03_26 release
+Changes:
+* Works. Previous release was broken.
+* Added Evo X as a supported vehicle
+
+Revision: 2704
+Date: 2008-03-25
+Comments: m1_2008_03_25 release
+Changes:
++ Made gear calibration more tolerable of rpm/kph interval for lower gears to compensate for low resolution in kph.
++ A/D converter plugin and preparation in m1 main application. Not finished yet.
++ Prepared m1 main application for multiple data feeds (ECU + A/D etc).
++ Fixed apex plugin to handle revents triggered reads when no data available. 
++ Apex device now uses cooked mode.
++ Setup meny rearranged to have most commonly used options on first screen.
++ Fixed error message when start log detects no memory stick
++ Fixed error message when log replay detects no file.
++ Fixed MAF max. 90->320 gr/sec. w/ traditional gauge update.
++ Fixed darkened background behind channellabels in log replay.
++ Fixed wheel size -> tire size in setup dialog.
++ Fixed bank gothic -> RadioFont Italic for 1.2 large numbers in circle skin
++ Added apex reset if 5 channel requests were not answered by ECU.
+
+
+
+Revision: 2689
+Date: 2008-03-13
+Comments: m1_2008_03_13 release
+Changes: 
++ Fixed internal bug with multiple updated event variables in a single object
+  only triggering script(s) for one of them (bug45/Rev 2689). 
++ Fixed internal bug with invocation sequence for class hierarchy scripts (bug44/Rev 2685). 
++ Fixed frozen digits at startup. (Rev 2678) 
++ Preparation for DRM managed files in M1. (Rev 2675)
+
+Revision: 2652
+Date: 2008-02-20
+Comments: m1_2008_02_20 release
+
+
+Revision: 2443
+Date: 2007-11-16
+Comments: Pratt & Miller release
+
+Revision: 2474
+Date: 2007-11-22
+Comments: m1_2007_11_22 + skins

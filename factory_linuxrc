@@ -1,0 +1,138 @@
+#!/bin/ash
+# (C) 2006,2007 Magden LLC. All rights reserved.
+# This script will be /sbin/init of the master USB memory stick created by create_master.sh
+# The purpose of the script is to do a factory (re-)install of an M1 unit.
+#
+
+# 
+# Decrease logging to avoid clutter
+#
+echo "c"
+dmesg -n 1 
+export DB_HOST=`cat /db_address.txt`
+export DB_USER=magdenus_trusted
+export DB_PASSWORD=phuc49aphu
+export DB_DATABASE=magdenus_trusted
+OS_ID=`cat /os.txt`
+M1_ID=`cat /m1.txt`
+CORE_ID=`cat /core.txt`
+
+
+insmod /lib/modules/2.6.24/kernel/drivers/scsi/scsi_mod.ko
+insmod /lib/modules/2.6.24/kernel/drivers/scsi/sd_mod.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/core/usbcore.ko
+insmod /lib/modules/2.6.24/kernel/drivers/hid/usbhid/usbhid.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/storage/usb-storage.ko
+#insmod /lib/modules/2.6.24/kernel/drivers/usb/host/ehci-hcd.ko # PRoblems with device resets use uhci for now
+insmod /lib/modules/2.6.24/kernel/drivers/usb/host/uhci-hcd.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/host/uhci-hcd.ko
+insmod /lib/modules/2.6.24/kernel/drivers/net/via-rhine.ko
+insmod /lib/modules/2.6.24/kernel/drivers/char/hw_random/via-rng.ko
+
+
+#sleep 7
+mount -t proc none /proc
+
+cat <<EOF
+c
+
+
+    Magden M1 Factory Installer
+
+
+EOF
+
+cd /
+/sbin/ifconfig eth0 `cat /ip_address.txt`
+
+echo "    Generating key pair."
+/bin/add_m1 -D/dev/hda -P`cat /part_nr.txt` 
+
+echo "    Formatting disk."
+
+/sbin/big_fdisk /dev/hda << __EOF__  > /dev/null 2>&1
+d
+1
+d
+2
+d
+3
+d
+4
+n
+p
+1
+
++500M
+n
+p
+2
+
+
+w
+q
+__EOF__
+#
+# Zero out database
+#
+/bin/dd if=/dev/zero of=/dev/hda2 bs=1024 count=2000 > /dev/null 2>&1
+/sbin/mkfs.ext2 -m0  /dev/hda1  > /dev/null 2>&1
+/sbin/tune2fs -c0 -i0 /dev/hda1  > /dev/null 2>&1
+mount -text2 /dev/hda1 /mnt  > /dev/null 2>&1
+
+# Needed by pf2fs
+mkdir -p /mnt/m1/install_db 
+mkdir -p /mnt/m1/keys
+
+# Mount root read only
+mount -oro /dev/sda /fat > /dev/null 2>&1
+mount -oro /dev/sda1 /fat > /dev/null 2>&1
+
+
+# Install from ramdisk. Only encrypt m1 files
+echo "    Installing os ${OS_ID}"
+cp /serial.txt /mnt/m1/serial.txt
+
+db2fs -D m1/install_db -r /mnt -i ${OS_ID}
+
+echo "    Installing and patching m1 binary ${M1_ID}"
+db2fs -D m1/install_db -r /mnt -i ${M1_ID} -P -s `cat /serial.txt`
+
+echo "    Installing and patching m1_core ${CORE_ID}"
+db2fs -D m1/install_db -r /mnt -i ${CORE_ID} -S .m1 -k magden
+
+
+
+echo "    Updating BIOS settings."
+cp /bios_settings.img /dev/nvram
+
+#
+# Install from ram disk.
+#
+echo "    Finshing installation."
+grub --batch --device-map=/mnt/boot/grub/device.map --boot-drive=0x80 << EOF > /dev/null 2>&1
+root (hd0,0)
+setup (hd0)
+quit
+EOF
+
+mount -oremount,ro /dev/hda1 /mnt
+umount /dev/sda > /dev/null 2>&1
+umount /dev/sda1 > /dev/null 2>&1
+sync
+cat << EOF
+    The M1 system has been installed.
+
+
+
+
+EOF
+echo "    ----------------------------"
+echo "    The serial number is: " `cat /serial.txt`
+echo "    ----------------------------"
+echo
+echo
+echo
+echo "    Turn off the M1 and remove the USB stick."
+sleep 100000
+reboot

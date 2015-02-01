@@ -1,0 +1,4 @@
+#
+# Core rules file. Will be copied into target fs 
+# /etc/udev/rules.d by the create_master.sh shell script.
+#

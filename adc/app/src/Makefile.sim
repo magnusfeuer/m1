@@ -1,0 +1,10 @@
+
+
+OBJS = \
+	simulator.o \
+	adc_main.o
+
+CFLAGS = -DDARWIN -g
+
+adc_sim: $(OBJS)
+	$(CC) -o $@ $(OBJS)

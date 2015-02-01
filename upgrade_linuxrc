@@ -1,0 +1,138 @@
+#!/bin/ash
+# (C) 2006,2007 Magden LLC. All rights reserved.
+# This script will be /sbin/init of the master USB memory stick created by create_master.sh
+# The purpose of the script is to do a factory (re-)install of an M1 unit.
+#
+
+# 
+# Decrease logging to avoid clutter
+#
+dmesg -n 1 
+
+
+insmod /lib/modules/2.6.24/kernel/drivers/scsi/scsi_mod.ko
+insmod /lib/modules/2.6.24/kernel/drivers/scsi/sd_mod.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/core/usbcore.ko
+insmod /lib/modules/2.6.24/kernel/drivers/hid/usbhid/usbhid.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/storage/usb-storage.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/host/uhci-hcd.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/host/ohci-hcd.ko
+# We get high speed USB device resets in the kernel log when we use ehci. Fall back to ohci for now.
+# insmod /lib/modules/2.6.24/kernel/drivers/usb/host/ehci-hcd.ko 
+
+
+#sleep 7
+mount -t proc none /proc
+
+cat <<EOF
+c
+
+
+                           Magden M.1 Upgrade.
+
+
+    This process will take a few minutes. Your settings 
+    will be preserved.
+
+    If you want to continue, please wait 15 seconds.
+
+    If you do not want to continue, please power off 
+    the M.1 and remove the USB stick.
+
+EOF
+
+# No expr and minimalistic shell gives crappy performance.
+echo -ne "    ............... \r"; sleep 1
+echo -ne "    .............. \r"; sleep 1
+echo -ne "    ............. \r"; sleep 1
+echo -ne "    ............ \r"; sleep 1
+echo -ne "    ........... \r"; sleep 1
+echo -ne "    .......... \r"; sleep 1
+echo -ne "    ......... \r"; sleep 1
+echo -ne "    ........ \r"; sleep 1
+echo -ne "    ....... \r"; sleep 1
+echo -ne "    ...... \r"; sleep 1
+echo -ne "    ..... \r"; sleep 1
+echo -ne "    .... \r"; sleep 1
+echo -ne "    ... \r"; sleep 1
+echo -ne "    .. \r"; sleep 1
+echo -ne "    . \r"; sleep 1
+
+cd /
+mount /dev/hda1 /mnt
+
+# Mount root read only
+mount -oro /dev/sda /fat > /dev/null 2>&1
+mount -oro /dev/sda1 /fat > /dev/null 2>&1
+M1_SERIAL=`cat /mnt/m1/serial.txt` 
+
+#
+# Check that we have the correct serial
+#
+for i in /fat/*.pfl
+do
+    
+    # Check that our target device is correct.
+    strings $i | grep -q Target-Device
+    SPECIFIC_TARGET="$?"
+    strings $i | grep Target-Device | grep -q $M1_SERIAL
+    if [ $SPECIFIC_TARGET == "0" -a "$?" != "0" ] 
+    then
+	echo "c"
+	echo -n "The USB stick is for "
+	strings $i | grep Target-Device:
+	echo "The upgrade on the USB stick is for M.1 unit: $M1_SERIAL."
+	echo 
+	echo "Please remove USB stick and power cycle the M.1 unit."
+	sleep 100000
+	reboot
+    fi
+done
+
+
+
+
+cat <<EOF 
+c
+ 
+
+
+
+    Doing a master install.
+
+    Step | Description
+    -----+------------------------
+    1/2  | Installing upgrade.
+EOF
+
+# Install from packfile
+pf2fs -r /mnt -d /mnt/m1/install_db -p /fat
+PF_RES="$?"
+if [ $PF_RES == "0" ]
+then
+    echo "    2/2  | Finishing install."
+fi
+
+mount -oremount,ro /dev/hda1 /mnt
+umount /dev/sda > /dev/null 2>&1
+umount /dev/sda1 > /dev/null 2>&1
+sync
+if [ $PF_RES == "0" ]
+then
+cat << EOF
+    ------------------------------
+
+    The M1 system has been upgraded.
+    Please power off the M1 now and remove the master USB memory stick.
+EOF
+else
+cat << EOF
+    ------------------------------
+
+    The M1 system could not be upgraded.
+    Please power off the M1 now and remove the master USB memory stick.
+EOF
+fi
+
+sleep 100000
+reboot

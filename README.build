@@ -1,0 +1,47 @@
+To make a local roll demo for your linux laptop.
+
+1. Check out the code and change into the directory
+svn co svn+ssh://[username]@feuerworks.dyndns.org/home/svn/magden/dist/jway/trunk jway
+cd jway
+
+
+2. Clean out old runtime code.
+Not necessary if you just checked out the code, but a good habit.
+rm -rf out
+
+
+3. Build code and skins.
+This will take a looong time (30 minutes or so  on my laptop). See m1/skins for available skins.
+make SKINS=common/roll_demo 
+
+
+4. Execute
+sh run_debug.sh
+
+
+
+
+To make a roll demo for an m1 and check it into the database.
+Top directory is SVN magden/dist/jway/trunk 
+
+1. Load database login names.
+. setup.sh
+
+2. Setup a database as described in README.db_setup step 1.
+
+3. Build linux kernel
+make kernel
+
+4. Install OS packfile in database
+sudo sh create_os_db.sh
+
+5. Install m1e binary in database
+make m1e_db
+
+6. Install roll demo in database
+make db DSKINS=jway/roll_demo
+
+
+
+
+

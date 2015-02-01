@@ -1,0 +1,34 @@
+#!/bin/ash
+# (C) 2006,2007 Magden LLC. All rights reserved.
+# This script will be /sbin/init of the master USB memory stick created by create_master.sh
+# The purpose of the script is to do a factory (re-)install of an M1 unit.
+#
+
+# 
+# Decrease logging to avoid clutter
+#
+dmesg -n 1 
+
+
+insmod /lib/modules/2.6.24/kernel/drivers/scsi/scsi_mod.ko
+insmod /lib/modules/2.6.24/kernel/drivers/scsi/sd_mod.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/core/usbcore.ko
+insmod /lib/modules/2.6.24/kernel/drivers/hid/usbhid/usbhid.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/storage/usb-storage.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/host/uhci-hcd.ko
+insmod /lib/modules/2.6.24/kernel/drivers/usb/host/ohci-hcd.ko
+# We get high speed USB device resets in the kernel log when we use ehci. Fall back to ohci for now.
+# insmod /lib/modules/2.6.24/kernel/drivers/usb/host/ehci-hcd.ko 
+
+
+#sleep 7
+mount -t proc none /proc
+
+echo "    Resetting database..."
+/bin/dd if=/dev/zero of=/dev/hda2 bs=1024 count=2000 > /dev/null 2>&1
+cat << EOF
+    The M1 has been resetted to factoryh settings.
+    Please power off the M1 now and remove the master USB memory stick.
+EOF
+sleep 100000
+reboot

@@ -1,0 +1,14 @@
+#
+# Core udev rules for the M1 system
+#
+KERNEL=="sda*", NAME="usb_diska%n", ENV{DISK}="/dev/usb_diska%n", RUN+="/etc/udev/disk.sh"
+KERNEL=="sdb*", NAME="usb_diskb%n", ENV{DISK}="/dev/usb_diskb%n", RUN+="/etc/udev/disk.sh"
+KERNEL=="sdc*", NAME="usb_diskc%n", ENV{DISK}="/dev/usb_diskc%n", RUN+="/etc/udev/disk.sh"
+KERNEL=="sdd*", NAME="usb_diskd%n", ENV{DISK}="/dev/usb_diskd%n", RUN+="/etc/udev/disk.sh"
+KERNEL=="sde*", NAME="usb_diske%n", ENV{DISK}="/dev/usb_diske%n", RUN+="/etc/udev/disk.sh"
+KERNEL=="sdf*", NAME="usb_diskf%n", ENV{DISK}="/dev/usb_diskf%n", RUN+="/etc/udev/disk.sh"
+KERNEL=="ttyUSB*", ATTRS{product}=="FT232R USB UART", NAME="ttyAPEX"
+KERNEL=="ttyUSB*", ATTRS{product}=="M1/*", NAME="ttyAD%n", SUBSYSTEM=="tty", ENV{TTY}="/dev/ttyAD%n", RUN+="/etc/udev/tty.sh"
+
+ACTION=="remove", DEVPATH=="/block/sd*", RUN+="/etc/udev/disk.sh"
+

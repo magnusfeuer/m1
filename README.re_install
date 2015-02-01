@@ -1,0 +1,36 @@
+To build a non DRM  master stick used to do a install on an m1 with an earlier m1 software
+already installd.
+These sticks are for internal use only. Do not let it get outside the office.
+
+
+1. Check out the code and change into the directory
+svn co svn+ssh://[username]@feuerworks.dyndns.org/home/svn/magden/dist/jway/trunk jway
+cd jway
+
+
+2. Clean out old packfiles, if existent
+rm -f packfiles/*
+
+
+3. Build
+make packfile PSKINS=jway/jway_core
+To build a roll demo: do PSKINS=jway/roll_demo instead.
+
+4. Create zip file.
+sh create_zip mydist.zip.
+
+5. Unpack to USB stick.
+Make sure a formatted USB stick is inserted.
+Unpack mydist.zip to the USB stick. No boot loeader is needed on USB stick.
+
+6. Boot the M1 with the master stick inserted.
+    
+7. Wait until install is complete. Remove stick and power cycle the M1.
+
+The master stick can also be used to upgrade a running system by inserting 
+it *after* the m1 has booted. In this case the software will be installed
+but the on board database will not be erased.
+
+The only difference between a bootable master stick and a regular stick with
+upgrade packfiles are the two files INITRD and LINUX on the stick.
+
