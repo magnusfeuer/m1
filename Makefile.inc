@@ -16,10 +16,10 @@ BUILD_ROOT ?= $(PWD)
 export BUILD_ROOT
 
 #
-# SVN server
+# git(hub) server
 #
-SVN_SERVER ?= file:///home/m1/svn/magden
-export SVN_SERVER
+GIT_SERVER ?= git@github.com:magnusfeuer
+export GIT_SERVER
 
 #
 # Versions for different components (app etc)
@@ -69,7 +69,7 @@ export M1_CORE_ABS_ROOT
 #export EXTERN_INCLUDE
 
 #
-# App prefix in SVN repository and in file system
+# Application root, containing all Mpl apps.
 #
 APP_ROOT=app
 export APP_ROOT
@@ -81,7 +81,7 @@ APP_ABS_ROOT=$(BUILD_ROOT)/$(APP_ROOT)
 export APP_ABS_ROOT
 
 #
-# Root prefix of all plugins both in SVN and file system
+# plugin (C++ drivers to integrate various hardware) root 
 #
 PLUGIN_ROOT=$(APP_ROOT)/plugins
 export PLUGIN_ROOT
@@ -102,7 +102,7 @@ export TARGET_DIR
 
 
 #
-# App prefix in SVN repository and in file system
+# Font root
 #
 FONT_ROOT=$(APP_ROOT)/src/fonts
 export FONT_ROOT
@@ -121,6 +121,9 @@ export BINDIR
 
 #
 # PACKDIR
+# Packfiles are the distribution format, like deb or rpm files,
+# used by m1. M1 boxes can be upgraded using USB sticks with
+# packfiles on them.
 #
 PACKDIR?=$(BUILD_ROOT)/packfiles
 export PACKDIR

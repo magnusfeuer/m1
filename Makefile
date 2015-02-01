@@ -40,7 +40,7 @@ CXX=g++
 # m1/tools/ddscomp (To compile bitmaps)
 # $(COMPILER)
 #
-CO_TRIGGER=./core/.svn/entries
+CO_TRIGGER=./core/.git/HEAD
 
 .PHONY: kernel check_error update core
 
@@ -86,7 +86,7 @@ kernel:
 update:
 	@echo
 	@echo "--- Updating core."
-	(cd m1; svn update)
+	(cd m1; git pull)
 
 m1e_packfile:
 	(cd $(CORE_PATH); make packfile)
@@ -123,7 +123,7 @@ $(DAPP): $(patsubst %,$(APP_ABS_ROOT)/%, $(DAPP))
 $(CO_TRIGGER):
 	@echo
 	@echo "--- Checking out m1 core."
-	svn co -q $(SVN_SERVER)/m1/core/$(CORE_VERSION) core
-	svn co -q $(SVN_SERVER)/m1/app/$(APP_VERSION) app
+	git checkout -q -b $(CORE_VERSION) $(GIT_SERVER)/m1_core core
+	svn co -q -b $(CORE_VERSION) $(SVN_SERVER)/m1_app app
 
 include Makefile.rules
