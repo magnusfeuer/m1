@@ -32,8 +32,8 @@ and ```github.com/magnusfeuer/m1_app```, with branches specced in ```Version.inc
 
 Once checked out the core engine is built with all its drivers, tools, etc.
 
-Finally the animation DDS files are created from ``app/src```, and the end
-result is packed up in ```out```
+Finally the animation DDS files are created from ```app/src```, and the end
+result is packed up in ```out```.
 
 From there, various shell scripts can be used to buid a bootable USB
 stick that installs the M1 on the target system.
