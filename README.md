@@ -28,8 +28,7 @@ A yocto port is strongly encouraged in order to start supporting other
 platforms.
 
 This top level build checks out ```github.com/magnusfeuer/m1_core```
-and ```github.com/magnusfeuer/m1_app```, with branches specced in
-```Version.inc```.
+and ```github.com/magnusfeuer/m1_app```, with branches specced in ```Version.inc```.
 
 Once checked out the core engine is built with all its drivers, tools, etc.
 
