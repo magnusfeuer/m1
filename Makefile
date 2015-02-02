@@ -123,7 +123,7 @@ $(DAPP): $(patsubst %,$(APP_ABS_ROOT)/%, $(DAPP))
 $(CO_TRIGGER):
 	@echo
 	@echo "--- Checking out m1 core."
-	git checkout -q -b $(CORE_VERSION) $(GIT_SERVER)/m1_core core
-	svn co -q -b $(CORE_VERSION) $(SVN_SERVER)/m1_app app
+	git clone -b $(CORE_VERSION) $(GIT_SERVER)/m1_core core
+	git clone -b $(APP_VERSION) $(GIT_SERVER)/m1_app app
 
 include Makefile.rules
