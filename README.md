@@ -27,16 +27,17 @@ quite shitty.
 A yocto port is strongly encouraged in order to start supporting other
 platforms.
 
-This top level build checks out github.com/magnusfeuer/m1_core and github.com/magnusfeuer/m1_app, with branches specced in Version.inc.  
+This top level build checks out ```github.com/magnusfeuer/m1_core```
+and ```github.com/magnusfeuer/m1_app```, with branches specced in
+```Version.inc```.
 
 Once checked out the core engine is built with all its drivers, tools, etc.
 
-Finally the animation DDS files are created from app/src, and the end
-result is packed up in ./out
+Finally the animation DDS files are created from ``app/src```, and the end
+result is packed up in ```out```
 
 From there, various shell scripts can be used to buid a bootable USB
 stick that installs the M1 on the target system.
-
 
 Please note that the system comes with full DRM system (Magden was a
 closed source company), but that it can be disabled during compile
@@ -45,24 +46,46 @@ working system.
 
 More documentation to come as I ressurect the code.
 
-To build, you need the following additional packages
+## Setting up the build box
 
-sudo apt-get install libpng-dev flex gperf g++ libx11-dev \
-     libmysqlclient-dev libssl-dev libgif-dev git
+Install an Ubuntu 12.04 *32 bit* version in a VM or on a build
+box. 20GB of disk will be needed for OS, tools, and build.
 
-MySQL is used to manage device key databases on the backend server. It has nothing to do with the code run on the device.
+Add the necessary packages using
 
-Non DRM versions of the code can be built in order to skip package protection and other corporate stuff not needed anymore
+    sudo apt-get install libpng-dev flex gperf g++ libx11-dev \
+        libmysqlclient-dev libssl-dev libgif-dev git
 
-X11 is only used in debug mode on the build host. The target code running on the device uses the framebuffer.
+MySQL is used to manage device key databases on the backend server. It
+has nothing to do with the code run on the device.
 
-This code only works with bison-2.3, which is distributed and built in core/extern, something that should be fixed.
+Non-DRM versions of the code can be built in order to skip package
+protection and other corporate stuff not needed anymore
 
+X11 is only used in debug mode on the build host. The target code
+running on the device uses the framebuffer.
+
+This code only works with bison-2.3, which is distributed and built in
+core/extern, something that should be fixed.
+
+We have custom font rendering, and tools that generates font files
+from truetype source fonts.
+
+We have our own graphics animation format, DDS, which is non
+destructive and allows direct mapping of an animation file into memory
+and render it directly from there onto a framebuffer. MMX, SSE, and
+SSE2 acceleration is supported.
+
+The frame buffer driver has a lot of Unichrome cruft code to support
+analog video out. There is a cleaned up version of the epic graphics
+code (now called EPX) available that we should probably port back to
+the M1 code.
 
 ## Building
 
-make APP=jway/roll_demo_x11
+    make APP=jway/roll_demo_x11
 
 ## Running
-sh run_debug.sh
+
+    sh run_debug.sh
 
