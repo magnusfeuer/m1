@@ -82,9 +82,12 @@ the M1 code.
 
 ## Building
 
-    make APP=jway/roll_demo_x11
+    make APP=common/roll_demo_debug
+
+Generates out/ directory packed with symlinks into app/
 
 ## Running
 
     sh run_debug.sh
 
+Simple script to start the stuff linked to in out/
