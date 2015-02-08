@@ -12,7 +12,15 @@ All art work is licensed under Creative Commons Attribution 4.0
 International (CC BY 4.0)
 
 /Magnus Feuer
+
 magnus _att_ feuerworks dott com
+
+# User Documentation
+Click on "View raw" in the pages below to download manuals
+
+[User Manual](https://github.com/magnusfeuer/m1/blob/master/M1%20Userguide%20MAN%20080607-05.pdf)
+
+[Quick Start](https://github.com/magnusfeuer/m1/blob/master/M1%20Quick%20Start%2003.pdf)
 
 
 # Build Notes
