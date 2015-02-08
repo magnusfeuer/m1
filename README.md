@@ -16,7 +16,7 @@ International (CC BY 4.0)
 magnus _att_ feuerworks dott com
 
 # MAGDEN M1 
-![Magden](https://raw.githubusercontent.com/magnusfeuer/m1/master/main_menu.png)
+![Magden](https://raw.githubusercontent.com/magnusfeuer/m1/master/screenshot.png)
 
 # User Documentation
 Click on "View raw" in the pages below to download manuals
