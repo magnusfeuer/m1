@@ -91,13 +91,23 @@ analog video out. There is a cleaned up version of the epic graphics
 code (now called EPX) available that we should probably port back to
 the M1 code.
 
-## Building
+## Build
 
     make APP=common/roll_demo_debug
 
 Generates out/ directory packed with symlinks into app/
 
-## Running
+## Create directory for installed package database
+
+   sudo mkdir /m1/install_db
+   sudo chmod 777 /m1/install_db
+
+This directory is semi-hardwired into the code (and I haven't had time
+to figure out how to change it). It is easier to just create it than
+start patching the code.
+
+
+## Run
 
     sh run_debug.sh
 
