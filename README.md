@@ -11,10 +11,11 @@ v2. (MPLv2)
 All art work is licensed under Creative Commons Attribution 4.0
 International (CC BY 4.0)
 
+
 /Magnus Feuer
 
 magnus _att_ feuerworks dott com
-
+IRC: Freenode #automotive
 # MAGDEN M1 
 ![Magden](https://raw.githubusercontent.com/magnusfeuer/m1/master/screenshot.jpg)
 
