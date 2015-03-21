@@ -94,7 +94,7 @@ the M1 code.
 
 ## Build
 
-    make APP=pi/roll_demo
+    make APP=pi2/roll_demo
 
 Generates out/ directory packed with symlinks into app/
 
