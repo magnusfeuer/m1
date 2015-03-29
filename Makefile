@@ -40,11 +40,13 @@ CXX=g++
 # m1/tools/ddscomp (To compile bitmaps)
 # $(COMPILER)
 #
-CO_TRIGGER=./core/.git/HEAD
+CORE_CLONE_TRIGGER=./core/.git/HEAD
+APP_CLONE_TRIGGER=./app/.git/HEAD
+EPX_CLONE_TRIGGER=./epx/.git/HEAD
 
-.PHONY: kernel check_error update core
 
-
+# .PHONY: kernel check_error update core
+.PHONY: o check_error update core
 
 master_all: check_invocation core $(APP)
 
@@ -52,7 +54,7 @@ packfile: core plugins $(PAPP)
 
 db: core plugins $(DAPP) 
 
-all_kernel: master_all kernel
+# all_kernel: master_all kernel
 
 check_invocation:
 ifeq ($(APP), nil)
@@ -61,27 +63,27 @@ ifeq ($(PAPP), nil)
 endif
 endif
 
-core:  $(CO_TRIGGER)
+core:  $(CORE_CLONE_TRIGGER) $(EPX_CLONE_TRIGGER)
 	@echo
 	@echo "--- Building core with external libs and tools."
 	@(cd $(CORE_PATH);$(MAKE))
 
 
-plugins:  $(CO_TRIGGER)
+plugins:  $(CORE_CLONE_TRIGGER)
 	@echo
 	@echo "--- Building plugins."
 	@(cd $(PLUGIN_PATH);$(MAKE))
 
-kernel: 
-	@echo
-	@echo "--- Building kernel."
-	(cd kernel; $(MAKE) all install)
-	@echo
-	@echo "--- Building busybox"
-	(cd busybox; $(MAKE))
-	@echo
-	@echo "--- Building udev"
-	(cd udev; $(MAKE))
+# kernel: 
+# 	@echo
+# 	@echo "--- Building kernel."
+# 	(cd kernel; $(MAKE) all install)
+# 	@echo
+# 	@echo "--- Building busybox"
+# 	(cd busybox; $(MAKE))
+# 	@echo
+# 	@echo "--- Building udev"
+# 	(cd udev; $(MAKE))
 
 update:
 	@echo
@@ -101,7 +103,9 @@ m1e_db:
 
 db: $(DAPP)
 
-$(PAPP): $(patsubst %,$(APP_ABS_ROOT)/%, $(PAPP))
+$(APP):	$(APP_CLONE_TRIGGER)
+
+$(PAPP): $(APP_CLONE_TRIGGER) $(patsubst %,$(APP_ABS_ROOT)/%, $(PAPP))
 	@echo
 	@echo "--- Building skin packfile $(@)"
 	@-rm -rf ptmp
@@ -110,7 +114,7 @@ $(PAPP): $(patsubst %,$(APP_ABS_ROOT)/%, $(PAPP))
 	(cd $(abspath $(APP_ABS_ROOT))/$(@)/; $(MAKE) pfile TARGET_DIR=$(BUILD_ROOT)/ptmp)
 
 
-$(DAPP): $(patsubst %,$(APP_ABS_ROOT)/%, $(DAPP))
+$(DAPP): $(APP_CLONE_TRIGGER) $(patsubst %,$(APP_ABS_ROOT)/%, $(DAPP))
 	@echo
 	@echo "--- Building DB packfile $(@)"
 	@-rm -rf ptmp
@@ -120,10 +124,19 @@ $(DAPP): $(patsubst %,$(APP_ABS_ROOT)/%, $(DAPP))
 
 
 
-$(CO_TRIGGER):
+$(CORE_CLONE_TRIGGER):
 	@echo
 	@echo "--- Checking out m1 core."
-	git clone -b $(CORE_VERSION) $(GIT_SERVER)/m1_core core
-	git clone -b $(APP_VERSION) $(GIT_SERVER)/m1_app app
+	git clone -b $(CORE_GIT_BRANCH) $(CORE_GIT_REPO) core
+
+$(APP_CLONE_TRIGGER):
+	@echo
+	@echo "--- Checking out m1 app."
+	git clone -b $(APP_GIT_BRANCH) $(APP_GIT_REPO) app
+
+$(EPX_CLONE_TRIGGER):
+	@echo
+	@echo "--- Checking out epx."
+	git clone -b $(EPX_GIT_BRANCH) $(EPX_GIT_REPO) epx
 
 include Makefile.rules

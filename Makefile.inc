@@ -15,12 +15,6 @@ export SHELL
 BUILD_ROOT ?= $(PWD)
 export BUILD_ROOT
 
-#
-# git(hub) server
-#
-#GIT_SERVER ?= git@github.com:magnusfeuer
-GIT_SERVER ?= https://github.com/magnusfeuer
-export GIT_SERVER
 
 #
 # Versions for different components (app etc)
