@@ -28,8 +28,6 @@ APP_ABS_PATH=$(BUILD_ROOT)/$(APP_PATH)
 CORE_PATH=./core
 CORE_ABS_PATH=$(BUILD_ROOT)/$(CORE_PATH)
 
-EPX_PATH=./epx
-EPX_ABS_PATH=$(BUILD_ROOT)/$(EPX_PATH)
 
 #
 # For now we will use native compilers.
@@ -69,11 +67,6 @@ core:  $(CORE_CLONE_TRIGGER)  epx
 	@echo
 	@echo "--- Building core with external libs and tools."
 	@(cd $(CORE_PATH);$(MAKE))
-
-epx: $(EPX_CLONE_TRIGGER)
-	@echo
-	@echo "--- Building epx and tools."
-	@(cd $(EPX_PATH);$(MAKE))
 
 plugins:  $(CORE_CLONE_TRIGGER)
 	@echo
