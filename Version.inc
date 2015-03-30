@@ -15,11 +15,5 @@ APP_GIT_BRANCH ?= master
 export APP_GIT_SERVER
 export APP_GIT_BRANCH
 
-#EPX_GIT_SERVER ?= https://github.com/magnusfeuer
-EPX_GIT_REPO ?= git@github.com:magnusfeuer/epx
-EPX_GIT_BRANCH ?= master
-export EPX_GIT_SERVER
-export EPX_GIT_BRANCH
-
 # The version of self to stamp files and distros with.
 VERSION=2.0.0

@@ -28,6 +28,9 @@ APP_ABS_PATH=$(BUILD_ROOT)/$(APP_PATH)
 CORE_PATH=./core
 CORE_ABS_PATH=$(BUILD_ROOT)/$(CORE_PATH)
 
+EPX_PATH=./epx
+EPX_ABS_PATH=$(BUILD_ROOT)/$(EPX_PATH)
+
 #
 # For now we will use native compilers.
 #
@@ -42,7 +45,6 @@ CXX=g++
 #
 CORE_CLONE_TRIGGER=./core/.git/HEAD
 APP_CLONE_TRIGGER=./app/.git/HEAD
-EPX_CLONE_TRIGGER=./epx/.git/HEAD
 
 
 # .PHONY: kernel check_error update core
@@ -63,11 +65,15 @@ ifeq ($(PAPP), nil)
 endif
 endif
 
-core:  $(CORE_CLONE_TRIGGER) $(EPX_CLONE_TRIGGER)
+core:  $(CORE_CLONE_TRIGGER)  epx
 	@echo
 	@echo "--- Building core with external libs and tools."
 	@(cd $(CORE_PATH);$(MAKE))
 
+epx: $(EPX_CLONE_TRIGGER)
+	@echo
+	@echo "--- Building epx and tools."
+	@(cd $(EPX_PATH);$(MAKE))
 
 plugins:  $(CORE_CLONE_TRIGGER)
 	@echo
@@ -133,10 +139,5 @@ $(APP_CLONE_TRIGGER):
 	@echo
 	@echo "--- Checking out m1 app."
 	git clone -b $(APP_GIT_BRANCH) $(APP_GIT_REPO) app
-
-$(EPX_CLONE_TRIGGER):
-	@echo
-	@echo "--- Checking out epx."
-	git clone -b $(EPX_GIT_BRANCH) $(EPX_GIT_REPO) epx
 
 include Makefile.rules
