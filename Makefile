@@ -63,7 +63,7 @@ ifeq ($(PAPP), nil)
 endif
 endif
 
-core:  $(CORE_CLONE_TRIGGER)  epx
+core:  $(CORE_CLONE_TRIGGER)  
 	@echo
 	@echo "--- Building core with external libs and tools."
 	@(cd $(CORE_PATH);$(MAKE))
