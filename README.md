@@ -66,7 +66,8 @@ Add the necessary packages using
 
     sudo apt-get install libpng-dev flex gperf g++ libx11-dev \
         libmysqlclient-dev libssl-dev libgif-dev git libfreetype6-dev \
-	libswscale-dev libavformat-dev erlang mesa-common-dev libglu1-mesa-dev
+	libswscale-dev libavformat-dev erlang mesa-common-dev libglu1-mesa-dev \
+	autoconf
 
 MySQL is used to manage device key databases on the backend server. It
 has nothing to do with the code run on the device.
