@@ -4,7 +4,7 @@
 #
 
 CORE_GIT_REPO ?= https://github.com/magnusfeuer/m1_core.git
-CORE_GIT_BRANCH ?= master
+CORE_GIT_BRANCH ?= pi
 export CORE_GIT_SERVER
 export CORE_GIT_BRANCH
 
