@@ -48,7 +48,7 @@ APP_CLONE_TRIGGER=./app/.git/HEAD
 # .PHONY: kernel check_error update core
 .PHONY: check_error update core $(APP) $(CORE_ABS_PATH)
 
-master_all: check_invocation core $(APP)
+master_all: check_invocation $(APP_CLONE_TRIGGER) core $(APP)
 
 packfile: core plugins $(PAPP) 
 
