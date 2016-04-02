@@ -15,7 +15,7 @@ all:   $(PLUGINS) $(APP) $(DDS_SOURCE) install_result
 $(FONTS):  
 	(for target in $(FONTS); do ( cd $(FONTS_SOURCE); $(MAKE) $(FONT) TARGETDIR=$(PWD)/dds SIZES=$(SIZES); done )
 
-$(APP): $(patsubst %,$(APP_ABS_ROOT)/%, $(APP))
+$(APP): $(APP_CLONE_TRIGGER) $(patsubst %,$(APP_ABS_ROOT)/%, $(APP))
 # Link in all files from the app to self's result_xxx directory
 	@echo
 	@echo "--- Building app $(@)"

@@ -46,7 +46,7 @@ APP_CLONE_TRIGGER=./app/.git/HEAD
 
 
 # .PHONY: kernel check_error update core
-.PHONY: o check_error update core
+.PHONY: check_error update core $(APP)
 
 master_all: check_invocation core $(APP)
 
@@ -101,8 +101,6 @@ m1e_db:
 	(cd $(CORE_PATH); make dpf)
 
 db: $(DAPP)
-
-$(APP):	$(APP_CLONE_TRIGGER)
 
 $(PAPP): $(APP_CLONE_TRIGGER) $(patsubst %,$(APP_ABS_ROOT)/%, $(PAPP))
 	@echo
