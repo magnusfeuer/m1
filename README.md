@@ -57,7 +57,7 @@ working system.
 
 More documentation to come as I ressurect the code.
 ## Setting up a Raspberry Pi 2 build
-Check out the ```pi``` version of this repo and follow the 
+Check out the ```pi``` branch of this repo and follow the 
 instructions below.
 
 ## Setting up the build box
