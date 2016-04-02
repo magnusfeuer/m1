@@ -56,10 +56,13 @@ time. There is no need to generate keys and other things to get a
 working system.
 
 More documentation to come as I ressurect the code.
+## Setting up a Raspberry Pi 2 build
+Check out the ```pi``` version of this repo and follow the 
+instructions below.
 
 ## Setting up the build box
 
-Install an Ubuntu 12.04 *32 bit* version in a VM or on a build
+Install an Ubuntu 14.04 *32 bit* version in a VM or on a build
 box. 20GB of disk will be needed for OS, tools, and build.
 
 Add the necessary packages using
