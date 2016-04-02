@@ -12,7 +12,7 @@ include Makefile.inc
 #
 #  Run the end result (in debug mode) as:
 #
-APP ?= jway/roll_demo
+APP ?= pi2/roll_demo
 
 
 #
@@ -46,7 +46,7 @@ APP_CLONE_TRIGGER=./app/.git/HEAD
 
 
 # .PHONY: kernel check_error update core
-.PHONY: check_error update core $(APP)
+.PHONY: check_error update core $(APP) $(CORE_ABS_PATH)
 
 master_all: check_invocation core $(APP)
 
