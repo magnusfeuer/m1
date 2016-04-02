@@ -105,8 +105,8 @@ Generates out/ directory packed with symlinks into app/
 
 ## Create directory for installed package database
 
-   sudo mkdir /m1/install_db
-   sudo chmod 777 /m1/install_db
+    sudo mkdir /m1/install_db
+    sudo chmod 777 /m1/install_db
 
 This directory is semi-hardwired into the code (and I haven't had time
 to figure out how to change it). It is easier to just create it than
